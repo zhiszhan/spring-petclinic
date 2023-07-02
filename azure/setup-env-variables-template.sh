@@ -4,7 +4,7 @@ export SPRING_APPS_SERVICE=azure-spring-apps-name   # name of the service that w
 export LOG_ANALYTICS_WORKSPACE=log-analytics-name   # existing workspace or one that will be created in next steps
 export REGION=region-name                           # choose a region with Enterprise tier support
 
-export PETCLINIC_JAR_APP="petclinic-jar"
-export PETCLINIC_NATIVE_APP="petclinic-native"
+export JAR_APP="jar-app"
+export NATIVE_APP="native-app"
 
 export CUSTOM_BUILDER="no-bindings-builder"
