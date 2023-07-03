@@ -459,7 +459,7 @@ Navigate to the URL provided by the previous commands to open the Pet Clinic app
 
 ![](./media/petclinic-native-app-landing-page.jpg)
 
-## Optimized Memory Usage
+## Unit 4 - Observe Optimized Memory Usage
 
 You can run some loads tests against the `jar-app` and `native-app` and compare the memory usage. We ran. The screenshot below shows optimized memory usage of this native image deployment – which is about 1/5th of the memory consumed by its equivalent JAR deployment - for a constant workload of 400 requests per second into the monolithic version of this Petclinic application.
 
