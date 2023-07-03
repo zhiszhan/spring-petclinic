@@ -294,8 +294,12 @@ az monitor diagnostic-settings create --name "send-logs-and-metrics-to-log-analy
 Create a custom builder in Tanzu Build Service using the Azure CLI:
 
 ```shell
-az spring build-service builder create -n ${CUSTOM_BUILDER} \
-    --builder-file azure/builder.json \
+az spring build-service builder update -n ${DEFAULT_BUILDER} \
+    --builder-file azure/builder-default.json \
+    --no-wait
+
+az spring build-service builder create -n ${NATIVE_BUILDER} \
+    --builder-file azure/builder-native.json \
     --no-wait
 ```
 
@@ -316,17 +320,19 @@ Deploy and build each application, specifying its required parameters
 ```shell
 # Deploy Petclinic app built as JAR
 az spring app deploy --name ${JAR_APP} \
-    --builder ${CUSTOM_BUILDER} \
     --source-path . \
     --build-env BP_JVM_VERSION=17
 
 # Deploy Petclinic app built as Java Native Image
 az spring app deploy --name ${NATIVE_APP} \
-    --builder ${CUSTOM_BUILDER} \
+    --builder ${NATIVE_BUILDER} \
+    --build-cpu 8 \
     --build-memory 16Gi \
     --source-path . \
-    --build-env BP_JVM_VERSION=17 BP_NATIVE_IMAGE=true
+    --build-env BP_JVM_VERSION=17 BP_NATIVE_IMAGE=true BP_MAVEN_BUILD_ARGUMENTS="-Dmaven.test.skip=true -Pnative package"
 ```
+
+   --build-cpu 4 --build-memory 12Gi --builder native
 
 > Note: Deploying all applications will take 5-10 minutes
 

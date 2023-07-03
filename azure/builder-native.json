@@ -1,15 +1,12 @@
 {
     "stack": {
       "id": "io.buildpacks.stacks.jammy",
-      "version": "full"
+      "version": "tiny"
     },
     "buildpackGroups": [
       {
         "name": "default",
         "buildpacks": [
-          {
-            "id": "tanzu-buildpacks/java-azure"
-          },
           {
             "id": "tanzu-buildpacks/java-native-image"
           }

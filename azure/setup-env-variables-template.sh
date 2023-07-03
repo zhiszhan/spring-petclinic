@@ -7,4 +7,5 @@ export REGION=region-name                           # choose a region with Enter
 export JAR_APP="jar-app"
 export NATIVE_APP="native-app"
 
-export CUSTOM_BUILDER="no-bindings-builder"
+export DEFAULT_BUILDER="default"
+export NATIVE_BUILDER="native"
