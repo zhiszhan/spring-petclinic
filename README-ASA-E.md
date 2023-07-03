@@ -27,6 +27,7 @@ You will:
 ## Understanding the Spring Petclinic application with a few diagrams
 <a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
 
+<!-- 
 ## Running petclinic locally
 Petclinic is a [Spring Boot](https://spring.io/guides/gs/spring-boot) application built using [Maven](https://spring.io/guides/gs/maven/) or [Gradle](https://spring.io/guides/gs/gradle/). You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
 
@@ -51,6 +52,8 @@ Or you can run it from Maven directly using the Spring Boot Maven plugin. If you
 ```
 
 > NOTE: If you prefer to use Gradle, you can build the app using `./gradlew build` and look for the jar file in `build/libs`.
+
+-->
 
 ## What you will need
 
@@ -131,7 +134,7 @@ git clone https://github.com/selvasingh/spring-petclinic
 cd spring-petclinic
 ```
 
-## Unit 1 - Deploy and Build Applications
+## Unit 1 - Create Azure Spring Apps and Applications
 
 ### Prepare your environment for deployments
 
@@ -144,11 +147,15 @@ cp ./azure/setup-env-variables-template.sh ./azure/setup-env-variables.sh
 Open `./azure/setup-env-variables.sh` and enter the following information:
 
 ```shell
-export SUBSCRIPTION=subscription-id                 # replace it with your subscription-id
-export RESOURCE_GROUP=resource-group-name           # existing resource group or one that will be created in next steps
-export SPRING_APPS_SERVICE=azure-spring-apps-name   # name of the service that will be created in the next steps
-export LOG_ANALYTICS_WORKSPACE=log-analytics-name   # existing workspace or one that will be created in next steps
-export REGION=region-name                           # choose a region with Enterprise tier support
+export SUBSCRIPTION=subscription-id # replace it with your subscription-id
+export RESOURCE_GROUP=resource-group-name # existing resource group or one that will be created in next steps
+export SPRING_APPS_SERVICE=azure-spring-apps-name # name of the service that will be created in the next steps
+export LOG_ANALYTICS_WORKSPACE=log-analytics-name # existing workspace or one that will be created in next steps
+export REGION=region-name # choose a region with Enterprise tier support
+
+export MYSQL_SERVER_NAME=mysql-servername # customize this
+export MYSQL_SERVER_ADMIN_NAME=admin-name # customize this
+export MYSQL_SERVER_ADMIN_PASSWORD=SuperS3cr3t # customize this
 ```
 
 The REGION value should be one of available regions for Azure Spring Apps (e.g. eastus). Please visit [here](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=spring-apps&regions=all) for all available regions for Azure Spring Apps.
@@ -313,9 +320,90 @@ az spring app create --name ${NATIVE_APP} --cpu 2 --memory 4Gi --assign-endpoint
 wait
 ```
 
-### Build and Deploy Polyglot Applications
+## Create MySQL Database
 
-Deploy and build each application, specifying its required parameters
+Create a MySQL database in Azure Database for MySQL.
+
+```bash
+# create mysql server and provide access from Azure resources
+az mysql flexible-server create \
+    --name ${MYSQL_SERVER_NAME} \
+    --resource-group ${RESOURCE_GROUP} \
+    --location ${REGION} \
+    --admin-user ${MYSQL_SERVER_ADMIN_NAME}  \
+    --admin-password ${MYSQL_SERVER_ADMIN_PASSWORD} \
+    --public-access 0.0.0.0 \
+    --tier Burstable \
+    --sku-name Standard_B1ms \
+    --storage-size 32
+
+# allow access from your dev machine for testing
+MY_IP=$(curl whatismyip.akamai.com)
+az mysql flexible-server firewall-rule create \
+        --resource-group ${RESOURCE_GROUP} \
+        --name ${MYSQL_SERVER_NAME} \
+        --rule-name devMachine \
+        --start-ip-address ${MY_IP} \
+        --end-ip-address ${MY_IP}
+
+# create database
+az mysql flexible-server db create \
+        --resource-group ${RESOURCE_GROUP} \
+        --server-name ${MYSQL_SERVER_NAME} \
+        --database-name ${MYSQL_DATABASE_NAME}
+
+# increase connection timeout
+az mysql flexible-server parameter set \
+    --resource-group ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} \
+    --name wait_timeout \
+    --value 2147483
+
+# set timezone   
+az mysql flexible-server parameter set \
+    --resource-group ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} \
+    --name time_zone \
+    --value "US/Pacific"
+
+# create managed identity for mysql. By assigning the identity to the mysql server, it will enable Azure AD authentication
+az identity create \
+    --name ${MYSQL_IDENTITY} \
+    --resource-group ${RESOURCE_GROUP} \
+    --location ${REGION}
+
+IDENTITY_ID=$(az identity show --name ${MYSQL_IDENTITY} --resource-group ${RESOURCE_GROUP} --query id -o tsv)
+
+# jar-app service connection
+az spring connection create mysql-flexible \
+    --resource-group ${RESOURCE_GROUP} \
+    --service ${SPRING_APPS_SERVICE} \
+    --connection MySQL_Petclinic \
+    --app ${JAR_APP} \
+    --deployment default \
+    --tg ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} \
+    --database ${MYSQL_DATABASE_NAME} \
+    --secret name=${MYSQL_SERVER_ADMIN_NAME} secret=${MYSQL_SERVER_ADMIN_PASSWORD} \
+    --client-type springboot
+
+# native-app service connection
+az spring connection create mysql-flexible \
+    --resource-group ${RESOURCE_GROUP} \
+    --service ${SPRING_APPS_SERVICE} \
+    --connection MySQL_Petclinic \
+    --app ${NATIVE_APP} \
+    --deployment default \
+    --tg ${RESOURCE_GROUP} \
+    --server ${MYSQL_SERVER_NAME} \
+    --database ${MYSQL_DATABASE_NAME} \
+    --secret name=${MYSQL_SERVER_ADMIN_NAME} secret=${MYSQL_SERVER_ADMIN_PASSWORD} \
+    --client-type springboot 
+```
+
+## Build and Deploy Spring Native Applications
+
+Deploy and build the same application as JAR and Java Native Image, specifying its required parameters:
 
 ```shell
 # Deploy Petclinic app built as JAR
@@ -330,8 +418,8 @@ az spring app deploy --name ${NATIVE_APP} \
     --build-memory 16Gi \
     --source-path . \
     --build-env BP_JVM_VERSION=17 BP_NATIVE_IMAGE=true BP_MAVEN_BUILD_ARGUMENTS="-Dmaven.test.skip=true -Pnative package"
-```
 
+```
 
 
 > Note: Deploying all applications will take 5-10 minutes
