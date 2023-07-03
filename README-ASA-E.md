@@ -332,7 +332,7 @@ az spring app deploy --name ${NATIVE_APP} \
     --build-env BP_JVM_VERSION=17 BP_NATIVE_IMAGE=true BP_MAVEN_BUILD_ARGUMENTS="-Dmaven.test.skip=true -Pnative package"
 ```
 
-   --build-cpu 4 --build-memory 12Gi --builder native
+
 
 > Note: Deploying all applications will take 5-10 minutes
 
