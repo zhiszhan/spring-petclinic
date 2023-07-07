@@ -459,7 +459,20 @@ Navigate to the URL provided by the previous commands to open the Pet Clinic app
 
 ![](./media/petclinic-native-app-landing-page.jpg)
 
-## Unit 4 - Observe Optimized Memory Usage
+## Unit 4 - Load Test
+
+### Create an Azure Load Testing resource
+Refer to [doc](https://learn.microsoft.com/en-us/azure/load-testing/quickstart-create-and-run-load-test?tabs=virtual-users#create-an-azure-load-testing-resource) to create an Azure Load Testing resource.
+
+### Create load test
+Refer to [doc](https://learn.microsoft.com/en-us/azure/load-testing/how-to-create-and-run-load-test-with-jmeter-script) to create two load tests with [Petclinic JMeter script](https://github.com/Azure-Samples/spring-petclinic/blob/main/src/test/jmeter/petclinic_test_plan.jmx):
+-  Load test for JAR application
+-  Load test for Java Native Image application
+
+### Run load test
+Refer to [doc](https://learn.microsoft.com/en-us/azure/load-testing/how-to-create-and-run-load-test-with-jmeter-script#run-the-load-test) to run the load tests for both JAR and  Java Native Image applications
+
+## Unit 5 - Observe Optimized Memory Usage
 
 You can run some loads tests against the `jar-app` and `native-app` and compare the memory usage. We ran. The screenshot below shows optimized memory usage of this native image deployment – which is about 1/5th of the memory consumed by its equivalent JAR deployment - for a constant workload of 400 requests per second into the monolithic version of this Petclinic application.
 
