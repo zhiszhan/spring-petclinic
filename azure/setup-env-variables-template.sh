@@ -12,10 +12,19 @@ export DEFAULT_BUILDER="default"
 export NATIVE_BUILDER="native"
 
 # ==== MYSQL INFO ====
-export MYSQL_SERVER_NAME=mysql-petclinic # customize this
-export MYSQL_SERVER_ADMIN_NAME=azureuser # customize this
-export MYSQL_SERVER_ADMIN_PASSWORD=SuperS3cr3t # customize this
+export MYSQL_SERVER_NAME="mysql-petclinic" # customize this
+export MYSQL_SERVER_ADMIN_NAME="azureuser" # customize this
+export MYSQL_SERVER_ADMIN_PASSWORD="SuperS3cr3t" # customize this
 export MYSQL_SERVER_FULL_NAME=${MYSQL_SERVER_NAME}.mysql.database.azure.com
 export MYSQL_SERVER_ADMIN_LOGIN_NAME=${MYSQL_SERVER_ADMIN_NAME}\@${MYSQL_SERVER_NAME}
-export MYSQL_DATABASE_NAME=petclinic
-export MYSQL_IDENTITY=mysql-identity
+export MYSQL_DATABASE_NAME="petclinic"
+export MYSQL_IDENTITY="mysql-identity"
+export MYSQL_DATABASE_CONNECTION_NAME="mysql_petclinic"
+
+# ==== POSTGRESQL INFO ====
+export POSTGRESQL_SERVER_NAME="postgres-petclinic" # customize this
+export POSTGRESQL_SERVER_ADMIN_NAME="azureuser" # customize this
+export POSTGRESQL_SERVER_ADMIN_PASSWORD="SuperS3cr3t" # customize this
+export POSTGRESQL_SERVER_FULL_NAME="${POSTGRESQL_SERVER_NAME}.postgres.database.azure.com"
+export POSTGRESQL_DATABASE_NAME="petclinic"
+export POSTGRESQL_DATABASE_CONNECTION_NAME="postgres_petclinic"
