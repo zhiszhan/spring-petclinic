@@ -487,7 +487,7 @@ In this quickstart, you deployed an existing Spring application as a Java Native
 
 ## Credits
 
-This Spring microservices sample is forked from 
+This Spring native sample is forked from 
 [spring-projects/spring-petclinic](https://github.com/spring-projects/spring-petclinic) - see [Petclinic README](./README-petclinic.md). 
 
 ## Contributing
