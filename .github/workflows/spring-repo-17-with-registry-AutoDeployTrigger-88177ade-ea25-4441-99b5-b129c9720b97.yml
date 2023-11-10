@@ -1,0 +1,42 @@
+name: Trigger auto deployment for spring-repo-17-with-registry
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/spring-repo-17-with-registry-AutoDeployTrigger-88177ade-ea25-4441-99b5-b129c9720b97.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.SPRINGREPO17WITHREGISTRY_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: zhiszhanbushbashacr.azurecr.io
+          registryUsername: ${{ secrets.SPRINGREPO17WITHREGISTRY_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.SPRINGREPO17WITHREGISTRY_REGISTRY_PASSWORD }}
+          containerAppName: spring-repo-17-with-registry
+          resourceGroup: zhiszhan-bugbash-rg
+          imageToBuild: zhiszhanbushbashacr.azurecr.io/spring-repo-17-with-registry:${{ github.sha }}
+          
+
+     
+
